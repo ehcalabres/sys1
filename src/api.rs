@@ -93,7 +93,7 @@ fn parse_decision_request(
         Ok(Json(request)) => Ok(request),
         Err(error) if error.status() == StatusCode::PAYLOAD_TOO_LARGE => {
             Err(ApiError::payload_too_large(format!(
-                "request body exceeds {max_request_bytes} bytes; base64 images and videos count toward this limit. Resize or compress the media, use a URL, or increase --max-request-bytes"
+                "request body exceeds {max_request_bytes} bytes; base64 images, videos and audio count toward this limit. Resize or compress the media, use a URL, or increase --max-request-bytes"
             )))
         }
         Err(error) => Err(ApiError::new(format!("invalid request JSON: {error}"))),
@@ -229,7 +229,7 @@ async fn systemone(
         Ok(value) => value,
         Err(error) if error.status() == StatusCode::PAYLOAD_TOO_LARGE => {
             return ApiError::payload_too_large(format!(
-                "request body exceeds {} bytes; base64 images and videos count toward this limit. Resize or compress the media, use a URL, or increase --max-request-bytes",
+                "request body exceeds {} bytes; base64 images, videos and audio count toward this limit. Resize or compress the media, use a URL, or increase --max-request-bytes",
                 limit.0
             ))
             .into_response();
@@ -336,6 +336,14 @@ mod tests {
             true
         }
 
+        fn supports_d1_typed(&self) -> bool {
+            true
+        }
+
+        fn supports_audio(&self) -> bool {
+            true
+        }
+
         fn predict_batch(
             &self,
             requests: Vec<DecisionRequest>,
@@ -415,7 +423,7 @@ mod tests {
                 "missing OpenAPI route [{method}] {path}"
             );
         }
-        for field in ["images", "videos"] {
+        for field in ["images", "videos", "audio"] {
             assert!(
                 json["components"]["schemas"]["DecisionRequest"]["properties"][field]
                     ["description"]
@@ -746,7 +754,15 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn accepts_image_and_video_sources_in_json_requests() {
+    async fn accepts_d1_typed_questions_on_compatible_backend() {
+        for path in ["/v1/systemone", "/v1/decide"] {
+            let response=test_router().oneshot(Request::post(path).header("content-type","application/json").body(Body::from(serde_json::to_vec(&serde_json::json!({"state":"invoice","questions":{"name":{"type":"text","instructions":"Name?"},"amount":{"type":"number","instructions":"Amount?"},"count":{"type":"number","instructions":"Count?","range":[0,10],"step":1},"due":{"type":"date","instructions":"Date?"},"box":{"type":"box","instructions":"Where?"},"boxes":{"type":"boxes","instructions":"Every cat.","max":4}}})).unwrap())).unwrap()).await.unwrap();
+            assert_eq!(response.status(), StatusCode::OK, "{path}");
+        }
+    }
+
+    #[tokio::test]
+    async fn accepts_image_video_and_audio_sources_in_json_requests() {
         let response = test_router()
             .oneshot(
                 Request::post("/v1/systemone")
@@ -756,6 +772,7 @@ mod tests {
                             "state": "test",
                             "images": [{"bytes": [1, 2, 3]}],
                             "videos": [{"base64": "AA=="}],
+                            "audio": [{"bytes": [1, 2, 3]}],
                             "questions": {"q0": {"type": "noul"}}
                         }))
                         .unwrap(),

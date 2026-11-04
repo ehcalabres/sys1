@@ -13,6 +13,9 @@ pub struct DecisionRequest {
     /// Experimental video inputs, accepted only by models with video support. Each item may be a public HTTP(S) URL, base64 string or data URL, JSON byte array, or object containing url, base64, or bytes.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub videos: Vec<MediaInput>,
+    /// Experimental audio clips, accepted only by models with audio support; same sources as images/videos.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub audio: Vec<MediaInput>,
     #[schema(value_type = Object)]
     pub questions: Map<String, Value>,
 }
@@ -25,6 +28,18 @@ pub enum MediaInput {
     Url(MediaUrl),
     Base64(MediaBase64),
     ByteObject(MediaBytes),
+}
+
+impl MediaInput {
+    /// Spoken instructions accept only the same bounded sources as top-level media.
+    pub(crate) fn spoken(value: &Value) -> Result<Option<Self>, serde_json::Error> {
+        if value.get("type").and_then(Value::as_str) != Some("audio") {
+            return Ok(None);
+        }
+        let mut source = value.as_object().unwrap().clone();
+        source.remove("type");
+        serde_json::from_value(Value::Object(source)).map(Some)
+    }
 }
 
 impl From<&str> for MediaInput {
@@ -65,6 +80,8 @@ pub struct SystemOneRequest {
     pub images: Vec<MediaInput>,
     /// Experimental video inputs, accepted only by models with video support.
     pub videos: Vec<MediaInput>,
+    /// Experimental audio clips, accepted only by models with audio support.
+    pub audio: Vec<MediaInput>,
     #[schema(value_type = Object)]
     pub questions: Map<String, Value>,
 }
@@ -130,7 +147,12 @@ impl TryFrom<Value> for SystemOneRequest {
             }
         };
         let state = required("state")?;
-        if !content(state, false) {
+        let has_media = ["images", "videos", "audio"].iter().any(|name| {
+            body.get(*name)
+                .and_then(Value::as_array)
+                .is_some_and(|v| !v.is_empty())
+        });
+        if !content(state, false) && !(state.is_null() && has_media) {
             return Err(invalid(
                 vec!["body".into(), "state".into()],
                 "Input should be a string, object, or array",
@@ -145,6 +167,7 @@ impl TryFrom<Value> for SystemOneRequest {
         };
         let images = media("images")?;
         let videos = media("videos")?;
+        let audio = media("audio")?;
         let questions = required("questions")?.as_object().ok_or_else(|| {
             invalid(
                 vec!["body".into(), "questions".into()],
@@ -175,10 +198,13 @@ impl TryFrom<Value> for SystemOneRequest {
                     "Input should be a string",
                 )
             })?;
-            if !matches!(kind, "noul" | "choice" | "score") {
+            if !matches!(
+                kind,
+                "noul" | "choice" | "score" | "text" | "number" | "date" | "box" | "boxes"
+            ) {
                 return Err(invalid(
                     [path.clone(), vec!["type".into()]].concat(),
-                    "Input should be 'noul', 'choice', or 'score'",
+                    "Unsupported question type",
                 ));
             }
             if let Some(instructions) = object.get("instructions")
@@ -189,6 +215,15 @@ impl TryFrom<Value> for SystemOneRequest {
                     "Input should be a string, object, array, or null",
                 ));
             }
+            if let Some(instructions) = object.get("instructions") {
+                MediaInput::spoken(instructions).map_err(|error| {
+                    invalid(
+                        [path.clone(), vec!["instructions".into()]].concat(),
+                        error.to_string(),
+                    )
+                })?;
+            }
+            validate_d1_question(question).map_err(|error| invalid(path.clone(), error))?;
             let criteria = object.get("criteria");
             let criteria_path = [path, vec!["criteria".into()]].concat();
             match kind {
@@ -255,6 +290,7 @@ impl TryFrom<Value> for SystemOneRequest {
                         }
                     }
                 }
+                "text" | "number" | "date" | "box" | "boxes" => {}
                 _ => unreachable!(),
             }
         }
@@ -263,9 +299,76 @@ impl TryFrom<Value> for SystemOneRequest {
             state: state.clone(),
             images,
             videos,
+            audio,
             questions: questions.clone(),
         })
     }
+}
+
+pub(crate) fn is_d1_typed(kind: &str) -> bool {
+    matches!(kind, "text" | "number" | "date" | "box" | "boxes")
+}
+/// Common validation for both API routes and direct native d1 calls.
+pub(crate) fn validate_d1_question(q: &Value) -> Result<(), String> {
+    let kind = q["type"].as_str().unwrap_or("");
+    if is_d1_typed(kind)
+        && (q["instructions"].is_null()
+            || q["instructions"]
+                .as_str()
+                .is_some_and(|s| s.trim().is_empty()))
+    {
+        return Err("Typed d1 questions require nonempty instructions".into());
+    }
+    if let Some(unit) = q.get("unit")
+        && !unit.is_null()
+        && !unit.is_string()
+    {
+        return Err("unit must be a string or null".into());
+    }
+    if let Some(max) = q.get("max")
+        && (kind != "boxes" || !max.as_u64().is_some_and(|n| (1..=16).contains(&n)))
+    {
+        return Err(
+            "max belongs to boxes and must be an integer from 1 to 16 for these checkpoints".into(),
+        );
+    }
+    if let Some(range) = q.get("range") {
+        if kind != "number" || range.as_array().is_none_or(|v| v.len() != 2) {
+            return Err("range belongs to number and must be [low, high]".into());
+        }
+        let low = range[0]
+            .as_f64()
+            .filter(|v| v.is_finite())
+            .ok_or("range values must be finite numbers")?;
+        let high = range[1]
+            .as_f64()
+            .filter(|v| v.is_finite())
+            .ok_or("range values must be finite numbers")?;
+        if low >= high || !(high - low).is_finite() {
+            return Err("range must run from low to high".into());
+        }
+        if let Some(step) = q.get("step") {
+            let step = step
+                .as_f64()
+                .filter(|v| v.is_finite() && *v > 0.)
+                .ok_or("step must be a positive finite number")?;
+            let n = (high - low) / step;
+            if !n.is_finite()
+                || n.round_ties_even() < 1.
+                || (n - n.round_ties_even()).abs() > 1e-9 * n.abs().max(n.round_ties_even().abs())
+            {
+                return Err("step must divide the declared range".into());
+            }
+        }
+    } else if q.get("step").is_some() {
+        return Err("step requires a number range".into());
+    }
+    if let Some(multiple) = q.get("multiple")
+        && (!multiple.is_boolean() || multiple == true && kind != "choice")
+    {
+        return Err("multiple is a boolean belonging to choice".into());
+    }
+    Ok(())
 }
 
 impl From<SystemOneRequest> for DecisionRequest {
@@ -275,6 +378,7 @@ impl From<SystemOneRequest> for DecisionRequest {
             state: request.state,
             images: request.images,
             videos: request.videos,
+            audio: request.audio,
             questions: request.questions,
         }
     }
@@ -355,6 +459,60 @@ impl ApiError {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn validates_typed_d1_questions_without_changing_legacy_criteria() {
+        for question in [
+            json!({"type":"text","instructions":"Who?"}),
+            json!({"type":"number","instructions":"How much?","unit":"EUR"}),
+            json!({"type":"number","instructions":"Count?","range":[0,10],"step":1}),
+            json!({"type":"number","instructions":"Estimate?","range":[-1,1],"step":0.25}),
+            json!({"type":"date","instructions":"When?"}),
+            json!({"type":"box","instructions":"Where?"}),
+            json!({"type":"boxes","instructions":"Every cat.","max":16}),
+            json!({"type":"noul"}),
+            json!({"type":"choice","criteria":{"x":null}}),
+            json!({"type":"score","criteria":["one"]}),
+        ] {
+            assert!(
+                SystemOneRequest::try_from(json!({"state":"document","questions":{"q":question}}))
+                    .is_ok(),
+                "{question}"
+            );
+        }
+        for question in [
+            json!({"type":"text"}),
+            json!({"type":"date","instructions":" "}),
+            json!({"type":"number","instructions":"Count?","range":[1,1]}),
+            json!({"type":"number","instructions":"Count?","range":[0,1],"step":0.3}),
+            json!({"type":"number","instructions":"Count?","range":[0,1],"step":0}),
+            json!({"type":"number","instructions":"Count?","range":[false,1]}),
+            json!({"type":"number","instructions":"Count?","step":1}),
+            json!({"type":"number","instructions":"Count?","unit":12}),
+            json!({"type":"box","instructions":"Where?","range":[0,1]}),
+            json!({"type":"boxes","instructions":"Every cat.","max":0}),
+            json!({"type":"boxes","instructions":"Every cat.","max":17}),
+            json!({"type":"boxes","instructions":"Every cat.","max":true}),
+            json!({"type":"box","instructions":"Where?","max":1}),
+        ] {
+            assert!(
+                SystemOneRequest::try_from(json!({"state":"document","questions":{"q":question}}))
+                    .is_err(),
+                "{question}"
+            );
+        }
+    }
+
+    #[test]
+    fn validates_audio_only_states_and_spoken_instruction_sources() {
+        let request=SystemOneRequest::try_from(json!({"state":null,"audio":[{"bytes":[1,2]}],"questions":{"q":{"type":"noul","instructions":{"type":"audio","base64":"AA=="}}}})).unwrap();
+        assert_eq!(request.audio.len(), 1);
+        assert!(
+            SystemOneRequest::try_from(json!({"state":null,"questions":{"q":{"type":"noul"}}}))
+                .is_err()
+        );
+        assert!(SystemOneRequest::try_from(json!({"state":"x","questions":{"q":{"type":"noul","instructions":{"type":"audio","path":"/etc/passwd"}}}})).is_err());
+    }
 
     #[test]
     fn accepts_each_json_media_representation() {

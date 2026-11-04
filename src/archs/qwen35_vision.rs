@@ -435,7 +435,7 @@ pub mod images {
             "image aspect ratio exceeds 200"
         );
         let round = |value: usize| {
-            ((value as f64 / factor as f64).round() as usize)
+            ((value as f64 / factor as f64).round_ties_even() as usize)
                 .max(1)
                 .saturating_mul(factor)
         };
@@ -459,6 +459,15 @@ pub mod images {
         config: &VisionConfig,
         max_tokens: usize,
     ) -> anyhow::Result<Images> {
+        decode_images_with_cap(images, config, max_tokens, usize::MAX)
+    }
+
+    pub(crate) fn decode_images_with_cap(
+        images: &[MediaInput],
+        config: &VisionConfig,
+        max_tokens: usize,
+        pixel_cap: usize,
+    ) -> anyhow::Result<Images> {
         let mut patches = Vec::new();
         let mut grids = Vec::with_capacity(images.len());
         let mut token_count = 0usize;
@@ -471,7 +480,12 @@ pub mod images {
         for image in images {
             let data = input_bytes(image, "image")?;
             let (width, height) = dimensions(&data)?;
-            let (new_h, new_w) = resized_size(height, width, size * merge)?;
+            let scale = (pixel_cap as f64 / (height as f64 * width as f64))
+                .sqrt()
+                .min(1.);
+            let capped_h = (height as f64 * scale).floor().max(1.) as usize;
+            let capped_w = (width as f64 * scale).floor().max(1.) as usize;
+            let (new_h, new_w) = resized_size(capped_h, capped_w, size * merge)?;
             let image_tokens = (new_h / (size * merge)).saturating_mul(new_w / (size * merge));
             token_count = token_count.saturating_add(image_tokens);
             anyhow::ensure!(
@@ -484,7 +498,13 @@ pub mod images {
                 "-i".into(),
                 "pipe:0".into(),
                 "-vf".into(),
-                format!("scale={new_w}:{new_h}:flags=bicubic"),
+                if capped_h != height || capped_w != width {
+                    format!(
+                        "scale={capped_w}:{capped_h}:flags=bicubic,scale={new_w}:{new_h}:flags=bicubic"
+                    )
+                } else {
+                    format!("scale={new_w}:{new_h}:flags=bicubic")
+                },
                 "-frames:v".into(),
                 "1".into(),
                 "-f".into(),
@@ -729,8 +749,9 @@ pub mod video {
             height.max(width) <= 200usize.saturating_mul(height.min(width)),
             "video aspect ratio exceeds 200"
         );
-        let round =
-            |value: usize| ((value as f64 / factor as f64).round() as usize).saturating_mul(factor);
+        let round = |value: usize| {
+            ((value as f64 / factor as f64).round_ties_even() as usize).saturating_mul(factor)
+        };
         let mut h = round(height);
         let mut w = round(width);
         let total = frames
@@ -743,6 +764,38 @@ pub mod video {
             h = ((height as f64 / beta / factor as f64).floor() as usize).max(1) * factor;
             w = ((width as f64 / beta / factor as f64).floor() as usize).max(1) * factor;
         } else if total < 4096 {
+            let beta = (4096. / (frames as f64 * height as f64 * width as f64)).sqrt();
+            h = (height as f64 * beta / factor as f64).ceil() as usize * factor;
+            w = (width as f64 * beta / factor as f64).ceil() as usize * factor;
+        }
+        Ok((h, w))
+    }
+
+    fn lfm3_resized_size(
+        frames: usize,
+        height: usize,
+        width: usize,
+        factor: usize,
+    ) -> anyhow::Result<(usize, usize)> {
+        anyhow::ensure!(height > 0 && width > 0, "empty video dimensions");
+        let scale = (factor as f64 / height as f64)
+            .max(factor as f64 / width as f64)
+            .max(1.);
+        let height = (height as f64 * scale) as usize;
+        let width = (width as f64 * scale) as usize;
+        anyhow::ensure!(
+            height.max(width) <= 200usize.saturating_mul(height.min(width)),
+            "video aspect ratio exceeds 200"
+        );
+        let mut h = ((height as f64 / factor as f64).round_ties_even() as usize) * factor;
+        let mut w = ((width as f64 / factor as f64).round_ties_even() as usize) * factor;
+        let t = (frames as f64 / 2.).round_ties_even() * 2.;
+        let total = t * h as f64 * w as f64;
+        if total > 25_165_824. {
+            let beta = (frames as f64 * height as f64 * width as f64 / 25_165_824.).sqrt();
+            h = ((height as f64 / beta / factor as f64).floor() as usize).max(1) * factor;
+            w = ((width as f64 / beta / factor as f64).floor() as usize).max(1) * factor;
+        } else if total < 4096. {
             let beta = (4096. / (frames as f64 * height as f64 * width as f64)).sqrt();
             h = (height as f64 * beta / factor as f64).ceil() as usize * factor;
             w = (width as f64 * beta / factor as f64).ceil() as usize * factor;
@@ -788,6 +841,16 @@ pub mod video {
         inputs: &[MediaInput],
         config: &VisionConfig,
         max_tokens: usize,
+    ) -> anyhow::Result<Videos> {
+        decode_videos_with_policy(inputs, config, max_tokens, false, 768)
+    }
+
+    pub(crate) fn decode_videos_with_policy(
+        inputs: &[MediaInput],
+        config: &VisionConfig,
+        max_tokens: usize,
+        lfm3: bool,
+        max_frames: usize,
     ) -> anyhow::Result<Videos> {
         crate::media::require_video_tools()?;
         let mut patches = Vec::new();
@@ -838,8 +901,12 @@ pub mod video {
                 .or_else(|| stream.r_frame_rate.as_deref().and_then(frame_rate))
                 .context("video frame rate is unavailable")?;
             let sample_count = ((total_frames as f64 / fps * 2.) as usize)
-                .clamp(4, 768)
+                .clamp(4, max_frames)
                 .min(total_frames);
+            anyhow::ensure!(
+                !lfm3 || sample_count >= 2,
+                "LFM3 video requires at least two frames"
+            );
             let indices: Vec<_> = (0..sample_count)
                 .map(|index| {
                     if sample_count == 1 {
@@ -850,8 +917,11 @@ pub mod video {
                     }
                 })
                 .collect();
-            let (height, width) =
-                resized_size(sample_count, stream.height, stream.width, size * merge)?;
+            let (height, width) = if lfm3 {
+                lfm3_resized_size(sample_count, stream.height, stream.width, size * merge)?
+            } else {
+                resized_size(sample_count, stream.height, stream.width, size * merge)?
+            };
             let video_tokens = sample_count
                 .div_ceil(2)
                 .saturating_mul(height / (size * merge))

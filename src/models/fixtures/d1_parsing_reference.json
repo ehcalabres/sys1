@@ -1,0 +1,379 @@
+{
+  "numbers": [
+    {
+      "text": "1 234,50 EUR",
+      "context": "",
+      "unit": null,
+      "expected": 1234.5,
+      "written_unit": "EUR"
+    },
+    {
+      "text": "$1,250.50",
+      "context": "",
+      "unit": null,
+      "expected": 1250.5,
+      "written_unit": "$"
+    },
+    {
+      "text": "1,250",
+      "context": "",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "1,250",
+      "context": "price $12.50",
+      "unit": null,
+      "expected": 1250,
+      "written_unit": null
+    },
+    {
+      "text": "1.250",
+      "context": "language=de",
+      "unit": null,
+      "expected": 1250,
+      "written_unit": null
+    },
+    {
+      "text": "1.234.567",
+      "context": "",
+      "unit": null,
+      "expected": 1234567,
+      "written_unit": null
+    },
+    {
+      "text": "12,50",
+      "context": "",
+      "unit": null,
+      "expected": 12.5,
+      "written_unit": null
+    },
+    {
+      "text": "12.5%",
+      "context": "",
+      "unit": null,
+      "expected": 12.5,
+      "written_unit": "%"
+    },
+    {
+      "text": "(£1,250.50)",
+      "context": "",
+      "unit": null,
+      "expected": -1250.5,
+      "written_unit": "£"
+    },
+    {
+      "text": "- $ 125",
+      "context": "",
+      "unit": null,
+      "expected": -125,
+      "written_unit": "$"
+    },
+    {
+      "text": "($-125)",
+      "context": "",
+      "unit": null,
+      "expected": null,
+      "written_unit": "$"
+    },
+    {
+      "text": "₹12,34,567.89",
+      "context": "",
+      "unit": null,
+      "expected": 1234567.89,
+      "written_unit": "₹"
+    },
+    {
+      "text": "12,34,567.89",
+      "context": "",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "2.5 million",
+      "context": "",
+      "unit": null,
+      "expected": 2500000,
+      "written_unit": null
+    },
+    {
+      "text": "2 Billion",
+      "context": "",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "2 billion",
+      "context": "",
+      "unit": null,
+      "expected": 2000000000,
+      "written_unit": null
+    },
+    {
+      "text": "2m",
+      "context": "population count",
+      "unit": null,
+      "expected": 2000000,
+      "written_unit": null
+    },
+    {
+      "text": "2m",
+      "context": "length",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "1 234,50 €",
+      "context": "",
+      "unit": null,
+      "expected": 1234.5,
+      "written_unit": "€"
+    },
+    {
+      "text": "1234",
+      "context": "",
+      "unit": null,
+      "expected": 1234,
+      "written_unit": null
+    },
+    {
+      "text": "1,234",
+      "context": "",
+      "unit": "USD",
+      "expected": 1234,
+      "written_unit": null
+    },
+    {
+      "text": "1,234",
+      "context": "locale=fr",
+      "unit": null,
+      "expected": 1.234,
+      "written_unit": null
+    },
+    {
+      "text": "1,234",
+      "context": "12.50 and 12,50",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "1,234",
+      "context": "<?xml version=\"1.0\"?>",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "١٢٣٤٫٥",
+      "context": "",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "١٢٣٤.٥",
+      "context": "",
+      "unit": null,
+      "expected": 1234.5,
+      "written_unit": null
+    },
+    {
+      "text": "１２３４.５",
+      "context": "",
+      "unit": null,
+      "expected": 1234.5,
+      "written_unit": null
+    },
+    {
+      "text": "−12.50",
+      "context": "",
+      "unit": null,
+      "expected": -12.5,
+      "written_unit": null
+    },
+    {
+      "text": "123456789012345678901234567890",
+      "context": "",
+      "unit": null,
+      "expected": 123456789012345678901234567900,
+      "written_unit": null
+    },
+    {
+      "text": "0.0000001",
+      "context": "",
+      "unit": null,
+      "expected": 1e-07,
+      "written_unit": null
+    },
+    {
+      "text": "one hundred",
+      "context": "",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "1e3",
+      "context": "",
+      "unit": null,
+      "expected": null,
+      "written_unit": null
+    },
+    {
+      "text": "2万",
+      "context": "",
+      "unit": null,
+      "expected": 20000,
+      "written_unit": null
+    },
+    {
+      "text": "3 crore",
+      "context": "",
+      "unit": null,
+      "expected": 30000000,
+      "written_unit": null
+    }
+  ],
+  "dates": [
+    {
+      "text": "03/04/2026",
+      "context": "",
+      "expected": null
+    },
+    {
+      "text": "03/04/2026",
+      "context": "day/month/year",
+      "expected": "2026-04-03"
+    },
+    {
+      "text": "03/04/2026",
+      "context": "locale=en-US",
+      "expected": "2026-03-04"
+    },
+    {
+      "text": "03/04/2026",
+      "context": "locale=en-GB",
+      "expected": "2026-04-03"
+    },
+    {
+      "text": "03/04/2026",
+      "context": "13/04/2026",
+      "expected": "2026-04-03"
+    },
+    {
+      "text": "03/04/2026",
+      "context": "day/month/year and month/day/year",
+      "expected": null
+    },
+    {
+      "text": "13/04/2026",
+      "context": "",
+      "expected": "2026-04-13"
+    },
+    {
+      "text": "2024-02-29",
+      "context": "",
+      "expected": "2024-02-29"
+    },
+    {
+      "text": "2026-02-29",
+      "context": "",
+      "expected": null
+    },
+    {
+      "text": "03/04/26",
+      "context": "",
+      "expected": null
+    },
+    {
+      "text": "03/04/26",
+      "context": "year 2026-11-04; dd/mm/yyyy",
+      "expected": "2026-04-03"
+    },
+    {
+      "text": "03/04/26",
+      "context": "2026-11-04 and 1926-11-04",
+      "expected": null
+    },
+    {
+      "text": "2026年10月20日",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "2026년 10월 20일",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "Tue, 20 Oct 2026",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "20 octobre 2026",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "20 października 2026",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "20 октября 2026",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "segunda-feira, 20 de outubro de 2026",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "October 20th, 2026",
+      "context": "",
+      "expected": "2026-10-20"
+    },
+    {
+      "text": "2026-11-04T9:10",
+      "context": "",
+      "expected": "2026-11-04T09:10:00"
+    },
+    {
+      "text": "2026-11-04 09:10:11.123Z",
+      "context": "",
+      "expected": "2026-11-04T09:10:11.123000+00:00"
+    },
+    {
+      "text": "2026-11-04T24:00",
+      "context": "",
+      "expected": "2026-11-05T00:00:00"
+    },
+    {
+      "text": "2026-11-04T09:10:11+02:00",
+      "context": "",
+      "expected": "2026-11-04T09:10:11+02:00"
+    },
+    {
+      "text": "２０２６-１１-０４",
+      "context": "",
+      "expected": "2026-11-04"
+    },
+    {
+      "text": "yesterday",
+      "context": "",
+      "expected": null
+    },
+    {
+      "text": "20 Oct",
+      "context": "",
+      "expected": null
+    }
+  ]
+}

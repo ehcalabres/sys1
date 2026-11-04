@@ -44,6 +44,8 @@ pub struct Batcher {
     max_questions_per_request: usize,
     supports_images: bool,
     supports_videos: bool,
+    supports_audio: bool,
+    supports_d1_typed: bool,
     metrics: Arc<BatcherMetrics>,
 }
 
@@ -55,6 +57,8 @@ impl Batcher {
     ) -> Self {
         let supports_images = model.supports_images();
         let supports_videos = model.supports_videos();
+        let supports_audio = model.supports_audio();
+        let supports_d1_typed = model.supports_d1_typed();
         let max_batch_size = config.max_batch_size.max(1);
         let max_batch_questions = config.max_batch_questions.max(1);
         let max_questions_per_request = config
@@ -170,6 +174,8 @@ impl Batcher {
             max_questions_per_request,
             supports_images,
             supports_videos,
+            supports_audio,
+            supports_d1_typed,
             metrics,
         }
     }
@@ -205,6 +211,7 @@ impl Batcher {
                 state: json!("Warm up the decision model before serving requests."),
                 images: Vec::new(),
                 videos: Vec::new(),
+                audio: Vec::new(),
                 questions,
             },
             None,
@@ -238,6 +245,25 @@ impl Batcher {
                 request.questions.len(),
                 self.max_questions_per_request
             )));
+        }
+        if !self.supports_d1_typed
+            && request
+                .questions
+                .values()
+                .any(|q| q["type"].as_str().is_some_and(crate::schema::is_d1_typed))
+        {
+            return Err(ApiError::new(
+                "text, number, date, box and boxes require a compatible d1 backend",
+            ));
+        }
+        if !self.supports_audio
+            && (!request.audio.is_empty()
+                || request
+                    .questions
+                    .values()
+                    .any(|q| q["instructions"]["type"] == "audio"))
+        {
+            return Err(ApiError::new("audio is not supported by this model"));
         }
         if !request.images.is_empty() && !self.supports_images {
             return Err(ApiError::new("images are not supported by this model"));
@@ -431,6 +457,7 @@ mod tests {
             state: json!("test"),
             images: Vec::new(),
             videos: Vec::new(),
+            audio: Vec::new(),
             questions,
         }
     }
@@ -491,6 +518,7 @@ mod tests {
                 state: json!("test"),
                 images: Vec::new(),
                 videos: Vec::new(),
+                audio: Vec::new(),
                 questions,
             })
             .await
@@ -636,6 +664,7 @@ mod tests {
                 state: json!("test"),
                 images: Vec::new(),
                 videos: Vec::new(),
+                audio: Vec::new(),
                 questions: Map::new(),
             })
             .await
@@ -651,11 +680,62 @@ mod tests {
                 state: json!("test"),
                 images: Vec::new(),
                 videos: Vec::new(),
+                audio: Vec::new(),
                 questions,
             })
             .await
             .unwrap_err();
         assert_eq!(oversized.status(), 400);
+    }
+
+    #[tokio::test]
+    async fn rejects_typed_questions_on_incompatible_backends() {
+        let batcher = Batcher::new(
+            Arc::new(RecordingModel::default()),
+            "test".into(),
+            BatcherConfig {
+                max_batch_size: 1,
+                max_batch_questions: 1,
+                max_questions_per_request: 1,
+                wait: Duration::ZERO,
+                queue_capacity: 1,
+                response_timeout: None,
+            },
+        );
+        for kind in ["text", "number", "date", "box", "boxes"] {
+            let mut request = one_question_request();
+            request.questions =
+                serde_json::from_value(json!({"q":{"type":kind,"instructions":"Read this."}}))
+                    .unwrap();
+            let error = batcher.predict(request).await.unwrap_err();
+            assert_eq!(error.status(), 400);
+            assert!(error.error.contains("compatible d1 backend"));
+        }
+    }
+
+    #[tokio::test]
+    async fn rejects_audio_and_spoken_questions_for_models_without_audio() {
+        let batcher = Batcher::new(
+            Arc::new(RecordingModel::default()),
+            "test".into(),
+            BatcherConfig {
+                max_batch_size: 1,
+                max_batch_questions: 1,
+                max_questions_per_request: 1,
+                wait: Duration::ZERO,
+                queue_capacity: 1,
+                response_timeout: None,
+            },
+        );
+        let mut request = one_question_request();
+        request.audio.push("data:audio/wav;base64,AA==".into());
+        let error = batcher.predict(request).await.unwrap_err();
+        assert_eq!(error.status(), 400);
+        assert!(error.error.contains("audio is not supported"));
+        let mut request = one_question_request();
+        request.questions.values_mut().next().unwrap()["instructions"] =
+            json!({"type":"audio","base64":"AA=="});
+        assert_eq!(batcher.predict(request).await.unwrap_err().status(), 400);
     }
 
     #[tokio::test]

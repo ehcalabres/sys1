@@ -1,0 +1,1210 @@
+[
+  {
+    "name": "text",
+    "request": {
+      "state": "I was charged twice. Please refund me.",
+      "questions": {
+        "refund": {
+          "type": "noul",
+          "instructions": "Is the customer requesting a refund?"
+        },
+        "team": {
+          "type": "choice",
+          "instructions": "Which team should handle this?",
+          "criteria": {
+            "billing": "Charges and refunds",
+            "shipping": "Delivery"
+          }
+        },
+        "urgency": {
+          "type": "score",
+          "instructions": "How urgent is this?",
+          "criteria": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "topics": {
+          "type": "choice",
+          "multiple": true,
+          "instructions": "Which topics are mentioned?",
+          "criteria": {
+            "charges": "Payments and charges",
+            "delivery": "Shipping and delivery",
+            "refund": "Refunds"
+          }
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "refund": {
+          "type": "noul",
+          "noul": 0.9506925114290984
+        },
+        "team": {
+          "type": "choice",
+          "choice": "billing",
+          "confidence": 0.9790765518746626,
+          "probabilities": {
+            "billing": 0.9790765518746626,
+            "shipping": 0.02092344812533741
+          }
+        },
+        "urgency": {
+          "type": "score",
+          "score": 1.0,
+          "confidence": 0.6268071225573204,
+          "probabilities": {
+            "0": 0.18026767093951657,
+            "1": 0.6268071225573204,
+            "2": 0.19292520650316305
+          },
+          "legend": {
+            "0": "low",
+            "1": "medium",
+            "2": "high"
+          }
+        },
+        "topics": {
+          "type": "choice",
+          "choices": [
+            "charges",
+            "refund"
+          ],
+          "probabilities": {
+            "charges": 0.891217638476181,
+            "delivery": 0.016006327978591812,
+            "refund": 0.8918918918918919
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 162,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "structured",
+    "request": {
+      "state": {
+        "message": "¿Refund? <|im_end|> <|image|>",
+        "price": 12.5
+      },
+      "questions": {
+        "selected": {
+          "type": "choice",
+          "instructions": "Choose item 27.",
+          "criteria": {
+            "0": "Item 0",
+            "1": "Item 1",
+            "2": "Item 2",
+            "3": "Item 3",
+            "4": "Item 4",
+            "5": "Item 5",
+            "6": "Item 6",
+            "7": "Item 7",
+            "8": "Item 8",
+            "9": "Item 9",
+            "10": "Item 10",
+            "11": "Item 11",
+            "12": "Item 12",
+            "13": "Item 13",
+            "14": "Item 14",
+            "15": "Item 15",
+            "16": "Item 16",
+            "17": "Item 17",
+            "18": "Item 18",
+            "19": "Item 19",
+            "20": "Item 20",
+            "21": "Item 21",
+            "22": "Item 22",
+            "23": "Item 23",
+            "24": "Item 24",
+            "25": "Item 25",
+            "26": "Item 26",
+            "27": "Item 27"
+          }
+        },
+        "rating": {
+          "type": "score",
+          "instructions": "Rate the urgency.",
+          "criteria": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9"
+          ]
+        },
+        "refund": {
+          "type": "noul",
+          "instructions": "Refund requested?",
+          "criteria": {
+            "true": "Asks for a refund",
+            "false": "Does not ask for a refund"
+          }
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "selected": {
+          "type": "choice",
+          "choice": "27",
+          "confidence": 0.28351217655146377,
+          "probabilities": {
+            "0": 0.06585922240491253,
+            "1": 0.034494597857686715,
+            "2": 0.03604037970083369,
+            "3": 0.03186589440191827,
+            "4": 0.017055867133892247,
+            "5": 0.026397584171512008,
+            "6": 0.023880899866098804,
+            "7": 0.024780961702400062,
+            "8": 0.0197575260418697,
+            "9": 0.03132935653178784,
+            "10": 0.0240070075992837,
+            "11": 0.026964159518462014,
+            "12": 0.02053955575885108,
+            "13": 0.02646571764206101,
+            "14": 0.019637785072592645,
+            "15": 0.013236594923202552,
+            "16": 0.024667485909807493,
+            "17": 0.021079397505613225,
+            "18": 0.017074797529372795,
+            "19": 0.011845530843279805,
+            "20": 0.026120959834269302,
+            "21": 0.019642607483591822,
+            "22": 0.024430021975966224,
+            "23": 0.02294440384343911,
+            "24": 0.020151386101670433,
+            "25": 0.02553242633989461,
+            "26": 0.060685695754266585,
+            "27": 0.28351217655146377
+          }
+        },
+        "rating": {
+          "type": "score",
+          "score": 3.0,
+          "confidence": 0.20895791062007363,
+          "probabilities": {
+            "0": 0.138916114718543,
+            "1": 0.15739729955564857,
+            "2": 0.20254948311833443,
+            "3": 0.20895791062007363,
+            "4": 0.12420182107030688,
+            "5": 0.10720331993632777,
+            "6": 0.029787774739792366,
+            "7": 0.01618632730513469,
+            "8": 0.007321828732853977,
+            "9": 0.0074781202029845775
+          },
+          "legend": {
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.9367762562334526
+        }
+      },
+      "usage": {
+        "input_tokens": 300,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "groups",
+    "request": {
+      "state": "The sky is blue.",
+      "questions": {
+        "q0": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q1": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q2": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q3": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q4": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q5": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q6": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q7": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q8": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q9": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q10": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q11": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q12": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q13": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q14": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q15": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q16": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "q0": {
+          "type": "noul",
+          "noul": 0.874523490384926
+        },
+        "q1": {
+          "type": "noul",
+          "noul": 0.8680317999998299
+        },
+        "q2": {
+          "type": "noul",
+          "noul": 0.8732210401227607
+        },
+        "q3": {
+          "type": "noul",
+          "noul": 0.881370291626553
+        },
+        "q4": {
+          "type": "noul",
+          "noul": 0.8830672094686476
+        },
+        "q5": {
+          "type": "noul",
+          "noul": 0.8862289803349811
+        },
+        "q6": {
+          "type": "noul",
+          "noul": 0.8917564696563771
+        },
+        "q7": {
+          "type": "noul",
+          "noul": 0.8873890821999685
+        },
+        "q8": {
+          "type": "noul",
+          "noul": 0.8885248263808553
+        },
+        "q9": {
+          "type": "noul",
+          "noul": 0.888955952425515
+        },
+        "q10": {
+          "type": "noul",
+          "noul": 0.8935901451831398
+        },
+        "q11": {
+          "type": "noul",
+          "noul": 0.8958170661197601
+        },
+        "q12": {
+          "type": "noul",
+          "noul": 0.8968549887077396
+        },
+        "q13": {
+          "type": "noul",
+          "noul": 0.8974550264149638
+        },
+        "q14": {
+          "type": "noul",
+          "noul": 0.8956236101114413
+        },
+        "q15": {
+          "type": "noul",
+          "noul": 0.8962289861517654
+        },
+        "q16": {
+          "type": "noul",
+          "noul": 0.8903926811543547
+        }
+      },
+      "usage": {
+        "input_tokens": 375,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "image",
+    "request": {
+      "state": "Inspect the picture.",
+      "questions": {
+        "color": {
+          "type": "choice",
+          "instructions": "What is the dominant color?",
+          "criteria": {
+            "red": "Red",
+            "blue": "Blue",
+            "green": "Green"
+          }
+        },
+        "red": {
+          "type": "noul",
+          "instructions": "Is there red in the visual input?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "color": {
+          "type": "choice",
+          "choice": "red",
+          "confidence": 0.9726111955816619,
+          "probabilities": {
+            "red": 0.9726111955816619,
+            "blue": 0.016773245290187696,
+            "green": 0.010615559128150443
+          }
+        },
+        "red": {
+          "type": "noul",
+          "noul": 0.9484508628294243
+        }
+      },
+      "usage": {
+        "input_tokens": 132,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "video",
+    "request": {
+      "state": "Inspect the clip.",
+      "questions": {
+        "color": {
+          "type": "choice",
+          "instructions": "What is the dominant color?",
+          "criteria": {
+            "red": "Red",
+            "blue": "Blue",
+            "green": "Green"
+          }
+        },
+        "red": {
+          "type": "noul",
+          "instructions": "Is there red in the visual input?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "color": {
+          "type": "choice",
+          "choice": "blue",
+          "confidence": 0.9243093499516997,
+          "probabilities": {
+            "red": 0.06707846662608428,
+            "blue": 0.9243093499516997,
+            "green": 0.008612183422216028
+          }
+        },
+        "red": {
+          "type": "noul",
+          "noul": 0.2345394141985739
+        }
+      },
+      "usage": {
+        "input_tokens": 92,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_extraction",
+    "request": {
+      "state": "ACME SA\nInvoice 2026-117\nTotal due: 1 234,50 EUR\nPay before 03/04/2026 (day/month/year)",
+      "questions": {
+        "payee": {
+          "type": "text",
+          "instructions": "Who issued the invoice?"
+        },
+        "total": {
+          "type": "number",
+          "instructions": "How much is due?"
+        },
+        "due": {
+          "type": "date",
+          "instructions": "By when must it be paid?"
+        },
+        "vat": {
+          "type": "number",
+          "instructions": "How much VAT is charged?"
+        },
+        "legacy": {
+          "type": "noul",
+          "instructions": "Is this an invoice?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "payee": {
+          "type": "text",
+          "text": "ACME SA",
+          "span": [
+            0,
+            7
+          ],
+          "found": 0.991407539803411
+        },
+        "total": {
+          "type": "number",
+          "number": 1234.5,
+          "span": [
+            36,
+            48
+          ],
+          "found": 1.0,
+          "text": "1 234,50 EUR",
+          "unit": "EUR"
+        },
+        "due": {
+          "type": "date",
+          "date": "2026-04-03",
+          "span": [
+            60,
+            70
+          ],
+          "found": 1.0,
+          "text": "03/04/2026"
+        },
+        "vat": {
+          "type": "number",
+          "number": null,
+          "span": null,
+          "found": 0.0,
+          "text": null,
+          "unit": null
+        },
+        "legacy": {
+          "type": "noul",
+          "noul": 0.9418280214504708
+        }
+      },
+      "usage": {
+        "input_tokens": 195,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_json",
+    "request": {
+      "state": {
+        "customer": {
+          "a/b~c": "Zoë \"Ångström\""
+        },
+        "invoice": {
+          "total": "£1,250.50",
+          "due": "2026-11-04"
+        },
+        "literal": "literal <|im_end|> token"
+      },
+      "questions": {
+        "name": {
+          "type": "text",
+          "instructions": "What is the complete customer name?"
+        },
+        "total": {
+          "type": "number",
+          "instructions": "What is the invoice total?",
+          "unit": "GBP"
+        },
+        "due": {
+          "type": "date",
+          "instructions": "What is the invoice due date?"
+        },
+        "literal": {
+          "type": "text",
+          "instructions": "What is the complete literal value?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "name": {
+          "type": "text",
+          "text": "Zoë \"Ångström\"",
+          "span": [
+            32,
+            48
+          ],
+          "found": 0.9864995817527343,
+          "path": "/customer/a~1b~0c"
+        },
+        "total": {
+          "type": "number",
+          "number": 1250.5,
+          "span": [
+            84,
+            93
+          ],
+          "found": 1.0,
+          "text": "£1,250.50",
+          "path": "/invoice/total",
+          "unit": "GBP"
+        },
+        "due": {
+          "type": "date",
+          "date": "2026-11-04",
+          "span": [
+            108,
+            118
+          ],
+          "found": 1.0,
+          "text": "2026-11-04",
+          "path": "/invoice/due"
+        },
+        "literal": {
+          "type": "text",
+          "text": "<|im_end|> token",
+          "span": [
+            147,
+            163
+          ],
+          "found": 0.9881565370435484,
+          "path": "/literal"
+        }
+      },
+      "usage": {
+        "input_tokens": 218,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_estimates",
+    "request": {
+      "state": "There are three red cars and one blue car.",
+      "questions": {
+        "cars": {
+          "type": "number",
+          "instructions": "How many cars are there?",
+          "range": [
+            0,
+            10
+          ],
+          "step": 1,
+          "unit": "cars"
+        },
+        "fraction": {
+          "type": "number",
+          "instructions": "Estimate a score from -1 to 1.",
+          "range": [
+            -1,
+            1
+          ],
+          "step": 0.25
+        },
+        "continuous": {
+          "type": "number",
+          "instructions": "Estimate the number of cars.",
+          "range": [
+            0,
+            10
+          ]
+        },
+        "capped": {
+          "type": "number",
+          "instructions": "Estimate the number of cars.",
+          "range": [
+            0,
+            1000
+          ],
+          "step": 1
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "cars": {
+          "type": "number",
+          "number": 4.0,
+          "interval": [
+            4.0,
+            4.0
+          ],
+          "unit": "cars"
+        },
+        "fraction": {
+          "type": "number",
+          "number": -1.0,
+          "interval": [
+            -1.0,
+            0.75
+          ],
+          "unit": null
+        },
+        "continuous": {
+          "type": "number",
+          "number": 3.622047244094488,
+          "interval": [
+            2.440944881889764,
+            4.960629921259843
+          ],
+          "unit": null
+        },
+        "capped": {
+          "type": "number",
+          "number": 354.33070866141736,
+          "interval": [
+            251.96850393700788,
+            543.3070866141733
+          ],
+          "unit": null
+        }
+      },
+      "usage": {
+        "input_tokens": 225,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_boxes",
+    "request": {
+      "state": null,
+      "questions": {
+        "cats": {
+          "type": "number",
+          "instructions": "How many cats are there?",
+          "range": [
+            0,
+            10
+          ],
+          "step": 1
+        },
+        "remote": {
+          "type": "box",
+          "instructions": "Where is the remote control on the left?"
+        },
+        "every_cat": {
+          "type": "boxes",
+          "instructions": "Every cat.",
+          "max": 4
+        },
+        "missing": {
+          "type": "box",
+          "instructions": "Where is the elephant?"
+        },
+        "empty": {
+          "type": "boxes",
+          "instructions": "Every elephant.",
+          "max": 2
+        },
+        "default_max": {
+          "type": "boxes",
+          "instructions": "Every cat."
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "cats": {
+          "type": "number",
+          "number": 2.0,
+          "interval": [
+            2.0,
+            2.0
+          ],
+          "unit": null
+        },
+        "remote": {
+          "type": "box",
+          "box": {
+            "top": 0.151,
+            "bottom": 0.241,
+            "left": 0.058,
+            "right": 0.272
+          },
+          "found": 0.9988715823230051,
+          "confidence": 0.936923076923077
+        },
+        "every_cat": {
+          "type": "boxes",
+          "boxes": [
+            {
+              "box": {
+                "top": 0.114,
+                "bottom": 0.984,
+                "left": 0.015,
+                "right": 0.495
+              },
+              "found": 1.0,
+              "confidence": 0.9401709401709402
+            },
+            {
+              "box": {
+                "top": 0.053,
+                "bottom": 0.774,
+                "left": 0.531,
+                "right": 0.999
+              },
+              "found": 0.9977914672040974,
+              "confidence": 0.9401709401709402
+            }
+          ],
+          "count": 2,
+          "at_least": false,
+          "presence": [
+            1.0,
+            0.9977914672040974,
+            0.0,
+            0.0
+          ]
+        },
+        "missing": {
+          "type": "box",
+          "box": null,
+          "found": 0.0,
+          "confidence": 0.0
+        },
+        "empty": {
+          "type": "boxes",
+          "boxes": [],
+          "count": 0,
+          "at_least": false,
+          "presence": [
+            0.0003555853484573502,
+            0.0003555853484573502
+          ]
+        },
+        "default_max": {
+          "type": "boxes",
+          "boxes": [
+            {
+              "box": {
+                "top": 0.115,
+                "bottom": 0.983,
+                "left": 0.016,
+                "right": 0.495
+              },
+              "found": 1.0,
+              "confidence": 0.9401709401709402
+            },
+            {
+              "box": {
+                "top": 0.054,
+                "bottom": 0.774,
+                "left": 0.532,
+                "right": 0.999
+              },
+              "found": 0.9972485680838012,
+              "confidence": 0.9401709401709402
+            }
+          ],
+          "count": 2,
+          "at_least": false,
+          "presence": [
+            1.0,
+            0.9972485680838012,
+            0.00018312447645846137,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "usage": {
+        "input_tokens": 1243,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "audio",
+    "request": {
+      "state": null,
+      "questions": {
+        "speech": {
+          "type": "noul",
+          "instructions": "Does someone speak in the recording?"
+        },
+        "sound": {
+          "type": "choice",
+          "instructions": "Which sound is heard?",
+          "criteria": {
+            "beeps": "Electronic beeps",
+            "speech": "A person speaking",
+            "music": "Music"
+          }
+        },
+        "volume": {
+          "type": "score",
+          "instructions": "How loud is the audio?",
+          "criteria": [
+            "quiet",
+            "medium",
+            "loud"
+          ]
+        }
+      }
+    },
+    "audio_fixtures": [
+      [
+        16000,
+        16000
+      ]
+    ],
+    "expected": {
+      "answers": {
+        "speech": {
+          "type": "noul",
+          "noul": 0.06273382150085553
+        },
+        "sound": {
+          "type": "choice",
+          "choice": "beeps",
+          "confidence": 0.9573921010474914,
+          "probabilities": {
+            "beeps": 0.9573921010474914,
+            "speech": 0.016509158839076672,
+            "music": 0.026098740113431985
+          }
+        },
+        "volume": {
+          "type": "score",
+          "score": 1.0,
+          "confidence": 0.4402967928607936,
+          "probabilities": {
+            "0": 0.1411268965337531,
+            "1": 0.41857631060545325,
+            "2": 0.4402967928607936
+          },
+          "legend": {
+            "0": "quiet",
+            "1": "medium",
+            "2": "loud"
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 107,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "audio_resampled",
+    "request": {
+      "state": null,
+      "questions": {
+        "speech": {
+          "type": "noul",
+          "instructions": "Does someone speak in the recording?"
+        },
+        "sound": {
+          "type": "choice",
+          "instructions": "Which sound is heard?",
+          "criteria": {
+            "beeps": "Electronic beeps",
+            "speech": "A person speaking",
+            "music": "Music"
+          }
+        },
+        "volume": {
+          "type": "score",
+          "instructions": "How loud is the audio?",
+          "criteria": [
+            "quiet",
+            "medium",
+            "loud"
+          ]
+        }
+      }
+    },
+    "audio_fixtures": [
+      [
+        8000,
+        12000
+      ]
+    ],
+    "expected": {
+      "answers": {
+        "speech": {
+          "type": "noul",
+          "noul": 0.0625181901652959
+        },
+        "sound": {
+          "type": "choice",
+          "choice": "beeps",
+          "confidence": 0.9591461780907924,
+          "probabilities": {
+            "beeps": 0.9591461780907924,
+            "speech": 0.015715281662218385,
+            "music": 0.02513854024698914
+          }
+        },
+        "volume": {
+          "type": "score",
+          "score": 1.0,
+          "confidence": 0.4431264843835973,
+          "probabilities": {
+            "0": 0.1329720071035883,
+            "1": 0.42390150851281444,
+            "2": 0.4431264843835973
+          },
+          "legend": {
+            "0": "quiet",
+            "1": "medium",
+            "2": "loud"
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 113,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "audio_multiple",
+    "request": {
+      "state": null,
+      "questions": {
+        "speech": {
+          "type": "noul",
+          "instructions": "Does someone speak in the recording?"
+        },
+        "sound": {
+          "type": "choice",
+          "instructions": "Which sound is heard?",
+          "criteria": {
+            "beeps": "Electronic beeps",
+            "speech": "A person speaking",
+            "music": "Music"
+          }
+        },
+        "volume": {
+          "type": "score",
+          "instructions": "How loud is the audio?",
+          "criteria": [
+            "quiet",
+            "medium",
+            "loud"
+          ]
+        }
+      }
+    },
+    "audio_fixtures": [
+      [
+        16000,
+        16000
+      ],
+      [
+        16000,
+        8000
+      ]
+    ],
+    "expected": {
+      "answers": {
+        "speech": {
+          "type": "noul",
+          "noul": 0.07173539590137304
+        },
+        "sound": {
+          "type": "choice",
+          "choice": "beeps",
+          "confidence": 0.958213695206172,
+          "probabilities": {
+            "beeps": 0.958213695206172,
+            "speech": 0.017138719331277082,
+            "music": 0.02464758546255098
+          }
+        },
+        "volume": {
+          "type": "score",
+          "score": 1.0,
+          "confidence": 0.4470003824015537,
+          "probabilities": {
+            "0": 0.13322397963731503,
+            "1": 0.4470003824015537,
+            "2": 0.4197756379611313
+          },
+          "legend": {
+            "0": "quiet",
+            "1": "medium",
+            "2": "loud"
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 116,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "mixed",
+    "request": {
+      "state": "Inspect the picture and listen to the audio.",
+      "questions": {
+        "speech": {
+          "type": "noul",
+          "instructions": "Does someone speak in the recording?"
+        },
+        "sound": {
+          "type": "choice",
+          "instructions": "Which sound is heard?",
+          "criteria": {
+            "beeps": "Electronic beeps",
+            "speech": "A person speaking",
+            "music": "Music"
+          }
+        },
+        "volume": {
+          "type": "score",
+          "instructions": "How loud is the audio?",
+          "criteria": [
+            "quiet",
+            "medium",
+            "loud"
+          ]
+        }
+      }
+    },
+    "audio_fixtures": [
+      [
+        16000,
+        16000
+      ]
+    ],
+    "expected": {
+      "answers": {
+        "speech": {
+          "type": "noul",
+          "noul": 0.06629506236692667
+        },
+        "sound": {
+          "type": "choice",
+          "choice": "beeps",
+          "confidence": 0.9576177304231902,
+          "probabilities": {
+            "beeps": 0.9576177304231902,
+            "speech": 0.016521179343360618,
+            "music": 0.025861090233449128
+          }
+        },
+        "volume": {
+          "type": "score",
+          "score": 1.0,
+          "confidence": 0.42829446489184714,
+          "probabilities": {
+            "0": 0.1529520638925947,
+            "1": 0.42829446489184714,
+            "2": 0.4187534712155582
+          },
+          "legend": {
+            "0": "quiet",
+            "1": "medium",
+            "2": "loud"
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 189,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "spoken",
+    "request": {
+      "state": "The sky is blue.",
+      "questions": {
+        "answer": {
+          "type": "noul",
+          "instructions": "SPOKEN_FIXTURE"
+        }
+      }
+    },
+    "audio_fixtures": [
+      [
+        16000,
+        16000
+      ]
+    ],
+    "expected": {
+      "answers": {
+        "answer": {
+          "type": "noul",
+          "noul": 0.470677327537566
+        }
+      },
+      "usage": {
+        "input_tokens": 41,
+        "output_tokens": 0
+      }
+    }
+  }
+]

@@ -26,6 +26,7 @@ const MODEL_FILES: &[&str] = &[
     "model.safetensors.index.json",
     "tokenizer.json",
     "processor_config.json",
+    "calibration.json",
 ];
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

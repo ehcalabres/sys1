@@ -1,4 +1,5 @@
 mod clef;
+mod d1;
 mod dtype;
 mod laya;
 
@@ -11,6 +12,7 @@ use serde::Deserialize;
 use std::{fs, path::Path};
 
 pub use clef::Clef;
+pub use d1::D1;
 pub use laya::Laya;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, ValueEnum)]
@@ -55,6 +57,8 @@ impl AttentionImplementation {
 pub enum Architecture {
     Laya,
     Qwen35,
+    Lfm3Vl,
+    Lfm3Omni,
 }
 
 impl Architecture {
@@ -62,6 +66,8 @@ impl Architecture {
         match model_type {
             "laya" => Some(Self::Laya),
             "qwen3_5" => Some(Self::Qwen35),
+            "lfm3_vl" => Some(Self::Lfm3Vl),
+            "lfm3_omni" => Some(Self::Lfm3Omni),
             _ => None,
         }
     }
@@ -137,9 +143,18 @@ struct LayaIdentity {
 pub enum Model {
     Laya(Box<Laya>),
     Clef(Box<Clef>),
+    D1(Box<D1>),
 }
 
 pub trait DecisionModel: Send + Sync {
+    fn supports_d1_typed(&self) -> bool {
+        false
+    }
+
+    fn supports_audio(&self) -> bool {
+        false
+    }
+
     fn supports_images(&self) -> bool {
         false
     }
@@ -155,12 +170,23 @@ pub trait DecisionModel: Send + Sync {
 }
 
 impl DecisionModel for Model {
+    fn supports_d1_typed(&self) -> bool {
+        matches!(self, Self::D1(_))
+    }
+
+    fn supports_audio(&self) -> bool {
+        match self {
+            Self::D1(model) => model.supports_audio(),
+            _ => false,
+        }
+    }
+
     fn supports_images(&self) -> bool {
-        matches!(self, Self::Clef(_))
+        matches!(self, Self::Clef(_) | Self::D1(_))
     }
 
     fn supports_videos(&self) -> bool {
-        matches!(self, Self::Clef(_))
+        matches!(self, Self::Clef(_) | Self::D1(_))
     }
 
     fn predict_batch(
@@ -170,6 +196,7 @@ impl DecisionModel for Model {
         match self {
             Self::Laya(model) => model.predict_batch(requests),
             Self::Clef(model) => model.predict_batch(requests),
+            Self::D1(model) => model.predict_batch(requests),
         }
     }
 }
@@ -182,6 +209,11 @@ pub fn load(
     attention: AttentionImplementation,
 ) -> anyhow::Result<Model> {
     match architecture {
+        Architecture::Lfm3Vl | Architecture::Lfm3Omni => {
+            D1::load(path, dtype, max_model_len, attention)
+                .map(Box::new)
+                .map(Model::D1)
+        }
         Architecture::Laya => Laya::load(path, dtype, max_model_len, attention)
             .map(Box::new)
             .map(Model::Laya),

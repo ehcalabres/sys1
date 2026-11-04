@@ -1,3 +1,4 @@
+pub(crate) mod audio;
 use crate::schema::MediaInput;
 use anyhow::{Context, bail};
 use base64::{Engine, engine::general_purpose::STANDARD};
@@ -279,6 +280,21 @@ pub(crate) fn run_file_tool(
         args,
         None,
         "video",
+        Duration::from_secs(120),
+        max_output,
+    )
+}
+
+pub(crate) fn run_audio_tool(
+    program: &str,
+    args: &[String],
+    max_output: usize,
+) -> anyhow::Result<Vec<u8>> {
+    run_media_command(
+        program,
+        args,
+        None,
+        "audio",
         Duration::from_secs(120),
         max_output,
     )

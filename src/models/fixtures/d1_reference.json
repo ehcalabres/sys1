@@ -1,0 +1,880 @@
+[
+  {
+    "name": "text",
+    "request": {
+      "state": "I was charged twice. Please refund me.",
+      "questions": {
+        "refund": {
+          "type": "noul",
+          "instructions": "Is the customer requesting a refund?"
+        },
+        "team": {
+          "type": "choice",
+          "instructions": "Which team should handle this?",
+          "criteria": {
+            "billing": "Charges and refunds",
+            "shipping": "Delivery"
+          }
+        },
+        "urgency": {
+          "type": "score",
+          "instructions": "How urgent is this?",
+          "criteria": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "topics": {
+          "type": "choice",
+          "multiple": true,
+          "instructions": "Which topics are mentioned?",
+          "criteria": {
+            "charges": "Payments and charges",
+            "delivery": "Shipping and delivery",
+            "refund": "Refunds"
+          }
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "refund": {
+          "type": "noul",
+          "noul": 0.9980610023366602
+        },
+        "team": {
+          "type": "choice",
+          "choice": "billing",
+          "confidence": 0.9957684238606904,
+          "probabilities": {
+            "billing": 0.9957684238606904,
+            "shipping": 0.004231576139309691
+          }
+        },
+        "urgency": {
+          "type": "score",
+          "score": 0.0,
+          "confidence": 0.6003454702878444,
+          "probabilities": {
+            "0": 0.6003454702878444,
+            "1": 0.36631424790051975,
+            "2": 0.03334028181163602
+          },
+          "legend": {
+            "0": "low",
+            "1": "medium",
+            "2": "high"
+          }
+        },
+        "topics": {
+          "type": "choice",
+          "choices": [
+            "charges",
+            "refund"
+          ],
+          "probabilities": {
+            "charges": 0.9555742155403142,
+            "delivery": 0.03209044681251451,
+            "refund": 0.9690721649484536
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 162,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "structured",
+    "request": {
+      "state": {
+        "message": "¿Refund? <|im_end|> <|image|>",
+        "price": 12.5
+      },
+      "questions": {
+        "selected": {
+          "type": "choice",
+          "instructions": "Choose item 27.",
+          "criteria": {
+            "0": "Item 0",
+            "1": "Item 1",
+            "2": "Item 2",
+            "3": "Item 3",
+            "4": "Item 4",
+            "5": "Item 5",
+            "6": "Item 6",
+            "7": "Item 7",
+            "8": "Item 8",
+            "9": "Item 9",
+            "10": "Item 10",
+            "11": "Item 11",
+            "12": "Item 12",
+            "13": "Item 13",
+            "14": "Item 14",
+            "15": "Item 15",
+            "16": "Item 16",
+            "17": "Item 17",
+            "18": "Item 18",
+            "19": "Item 19",
+            "20": "Item 20",
+            "21": "Item 21",
+            "22": "Item 22",
+            "23": "Item 23",
+            "24": "Item 24",
+            "25": "Item 25",
+            "26": "Item 26",
+            "27": "Item 27"
+          }
+        },
+        "rating": {
+          "type": "score",
+          "instructions": "Rate the urgency.",
+          "criteria": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9"
+          ]
+        },
+        "refund": {
+          "type": "noul",
+          "instructions": "Refund requested?",
+          "criteria": {
+            "true": "Asks for a refund",
+            "false": "Does not ask for a refund"
+          }
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "selected": {
+          "type": "choice",
+          "choice": "27",
+          "confidence": 0.30730240000291675,
+          "probabilities": {
+            "0": 0.04960687763350093,
+            "1": 0.03173376725812889,
+            "2": 0.033911199953044494,
+            "3": 0.03329344964998442,
+            "4": 0.02566102222728379,
+            "5": 0.03548252384749339,
+            "6": 0.027599383953687478,
+            "7": 0.017646873251061252,
+            "8": 0.029445011581528926,
+            "9": 0.027699365009311333,
+            "10": 0.021871492435189953,
+            "11": 0.031315651114163796,
+            "12": 0.021193088916657127,
+            "13": 0.026216991144816636,
+            "14": 0.014477577646488828,
+            "15": 0.022797060194468186,
+            "16": 0.02068397830789657,
+            "17": 0.022022530098495696,
+            "18": 0.013597547870734387,
+            "19": 0.015597410787880232,
+            "20": 0.01771086997286294,
+            "21": 0.023483982774161156,
+            "22": 0.022633551520701487,
+            "23": 0.024795774475642008,
+            "24": 0.015805284657109484,
+            "25": 0.021664317940024755,
+            "26": 0.04475101577476512,
+            "27": 0.30730240000291675
+          }
+        },
+        "rating": {
+          "type": "score",
+          "score": 3.0,
+          "confidence": 0.1658442458298966,
+          "probabilities": {
+            "0": 0.13914296258409317,
+            "1": 0.1327821072652951,
+            "2": 0.15312324332288668,
+            "3": 0.1658442458298966,
+            "4": 0.15024360690688995,
+            "5": 0.10969390576707329,
+            "6": 0.0525637308808042,
+            "7": 0.0445341477582825,
+            "8": 0.02178912831449568,
+            "9": 0.030282921370282705
+          },
+          "legend": {
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9"
+          }
+        },
+        "refund": {
+          "type": "noul",
+          "noul": 0.9922056493757775
+        }
+      },
+      "usage": {
+        "input_tokens": 300,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "groups",
+    "request": {
+      "state": "The sky is blue.",
+      "questions": {
+        "q0": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q1": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q2": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q3": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q4": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q5": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q6": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q7": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q8": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q9": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q10": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q11": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q12": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q13": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q14": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q15": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        },
+        "q16": {
+          "type": "noul",
+          "instructions": "Is the sky blue?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "q0": {
+          "type": "noul",
+          "noul": 0.9551415257154648
+        },
+        "q1": {
+          "type": "noul",
+          "noul": 0.961365890628075
+        },
+        "q2": {
+          "type": "noul",
+          "noul": 0.9513848634674325
+        },
+        "q3": {
+          "type": "noul",
+          "noul": 0.9527809575603037
+        },
+        "q4": {
+          "type": "noul",
+          "noul": 0.9544464407743656
+        },
+        "q5": {
+          "type": "noul",
+          "noul": 0.9563228089891433
+        },
+        "q6": {
+          "type": "noul",
+          "noul": 0.9571812327519862
+        },
+        "q7": {
+          "type": "noul",
+          "noul": 0.9622518286103691
+        },
+        "q8": {
+          "type": "noul",
+          "noul": 0.9628038096513268
+        },
+        "q9": {
+          "type": "noul",
+          "noul": 0.9607151450196667
+        },
+        "q10": {
+          "type": "noul",
+          "noul": 0.963993977116832
+        },
+        "q11": {
+          "type": "noul",
+          "noul": 0.9664429020311663
+        },
+        "q12": {
+          "type": "noul",
+          "noul": 0.9689321621951474
+        },
+        "q13": {
+          "type": "noul",
+          "noul": 0.9694765917544578
+        },
+        "q14": {
+          "type": "noul",
+          "noul": 0.9668299979618995
+        },
+        "q15": {
+          "type": "noul",
+          "noul": 0.9703093841149418
+        },
+        "q16": {
+          "type": "noul",
+          "noul": 0.9762279295238145
+        }
+      },
+      "usage": {
+        "input_tokens": 375,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "image",
+    "request": {
+      "state": "Inspect the picture.",
+      "questions": {
+        "color": {
+          "type": "choice",
+          "instructions": "What is the dominant color?",
+          "criteria": {
+            "red": "Red",
+            "blue": "Blue",
+            "green": "Green"
+          }
+        },
+        "red": {
+          "type": "noul",
+          "instructions": "Is there red in the visual input?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "color": {
+          "type": "choice",
+          "choice": "red",
+          "confidence": 0.999184428977864,
+          "probabilities": {
+            "red": 0.999184428977864,
+            "blue": 0.0005014722468274504,
+            "green": 0.000314098775308486
+          }
+        },
+        "red": {
+          "type": "noul",
+          "noul": 0.9963252638402326
+        }
+      },
+      "usage": {
+        "input_tokens": 132,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "video",
+    "request": {
+      "state": "Inspect the clip.",
+      "questions": {
+        "color": {
+          "type": "choice",
+          "instructions": "What is the dominant color?",
+          "criteria": {
+            "red": "Red",
+            "blue": "Blue",
+            "green": "Green"
+          }
+        },
+        "red": {
+          "type": "noul",
+          "instructions": "Is there red in the visual input?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "color": {
+          "type": "choice",
+          "choice": "blue",
+          "confidence": 0.7761021982758639,
+          "probabilities": {
+            "red": 0.2154896381092993,
+            "blue": 0.7761021982758639,
+            "green": 0.008408163614836746
+          }
+        },
+        "red": {
+          "type": "noul",
+          "noul": 0.5126696398581413
+        }
+      },
+      "usage": {
+        "input_tokens": 92,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_extraction",
+    "request": {
+      "state": "ACME SA\nInvoice 2026-117\nTotal due: 1 234,50 EUR\nPay before 03/04/2026 (day/month/year)",
+      "questions": {
+        "payee": {
+          "type": "text",
+          "instructions": "Who issued the invoice?"
+        },
+        "total": {
+          "type": "number",
+          "instructions": "How much is due?"
+        },
+        "due": {
+          "type": "date",
+          "instructions": "By when must it be paid?"
+        },
+        "vat": {
+          "type": "number",
+          "instructions": "How much VAT is charged?"
+        },
+        "legacy": {
+          "type": "noul",
+          "instructions": "Is this an invoice?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "payee": {
+          "type": "text",
+          "text": "ACME SA",
+          "span": [
+            0,
+            7
+          ],
+          "found": 0.9972501592969906
+        },
+        "total": {
+          "type": "number",
+          "number": 1234.5,
+          "span": [
+            36,
+            48
+          ],
+          "found": 0.9998643218164226,
+          "text": "1 234,50 EUR",
+          "unit": "EUR"
+        },
+        "due": {
+          "type": "date",
+          "date": "2026-04-03",
+          "span": [
+            60,
+            70
+          ],
+          "found": 1.0,
+          "text": "03/04/2026"
+        },
+        "vat": {
+          "type": "number",
+          "number": null,
+          "span": null,
+          "found": 0.0,
+          "text": null,
+          "unit": null
+        },
+        "legacy": {
+          "type": "noul",
+          "noul": 0.9943856517885473
+        }
+      },
+      "usage": {
+        "input_tokens": 195,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_json",
+    "request": {
+      "state": {
+        "customer": {
+          "a/b~c": "Zoë \"Ångström\""
+        },
+        "invoice": {
+          "total": "£1,250.50",
+          "due": "2026-11-04"
+        },
+        "literal": "literal <|im_end|> token"
+      },
+      "questions": {
+        "name": {
+          "type": "text",
+          "instructions": "What is the complete customer name?"
+        },
+        "total": {
+          "type": "number",
+          "instructions": "What is the invoice total?",
+          "unit": "GBP"
+        },
+        "due": {
+          "type": "date",
+          "instructions": "What is the invoice due date?"
+        },
+        "literal": {
+          "type": "text",
+          "instructions": "What is the complete literal value?"
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "name": {
+          "type": "text",
+          "text": "Zoë \"Ångström\"",
+          "span": [
+            32,
+            48
+          ],
+          "found": 0.9856331897611214,
+          "path": "/customer/a~1b~0c"
+        },
+        "total": {
+          "type": "number",
+          "number": 1250.5,
+          "span": [
+            84,
+            93
+          ],
+          "found": 1.0,
+          "text": "£1,250.50",
+          "path": "/invoice/total",
+          "unit": "GBP"
+        },
+        "due": {
+          "type": "date",
+          "date": "2026-11-04",
+          "span": [
+            108,
+            118
+          ],
+          "found": 1.0,
+          "text": "2026-11-04",
+          "path": "/invoice/due"
+        },
+        "literal": {
+          "type": "text",
+          "text": null,
+          "span": null,
+          "found": 0.4439554177039726
+        }
+      },
+      "usage": {
+        "input_tokens": 218,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_estimates",
+    "request": {
+      "state": "There are three red cars and one blue car.",
+      "questions": {
+        "cars": {
+          "type": "number",
+          "instructions": "How many cars are there?",
+          "range": [
+            0,
+            10
+          ],
+          "step": 1,
+          "unit": "cars"
+        },
+        "fraction": {
+          "type": "number",
+          "instructions": "Estimate a score from -1 to 1.",
+          "range": [
+            -1,
+            1
+          ],
+          "step": 0.25
+        },
+        "continuous": {
+          "type": "number",
+          "instructions": "Estimate the number of cars.",
+          "range": [
+            0,
+            10
+          ]
+        },
+        "capped": {
+          "type": "number",
+          "instructions": "Estimate the number of cars.",
+          "range": [
+            0,
+            1000
+          ],
+          "step": 1
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "cars": {
+          "type": "number",
+          "number": 4.0,
+          "interval": [
+            4.0,
+            4.0
+          ],
+          "unit": "cars"
+        },
+        "fraction": {
+          "type": "number",
+          "number": -0.75,
+          "interval": [
+            -1.0,
+            0.75
+          ],
+          "unit": null
+        },
+        "continuous": {
+          "type": "number",
+          "number": 0.5511811023622047,
+          "interval": [
+            0.0,
+            2.1259842519685037
+          ],
+          "unit": null
+        },
+        "capped": {
+          "type": "number",
+          "number": 47.24409448818898,
+          "interval": [
+            0.0,
+            173.22834645669292
+          ],
+          "unit": null
+        }
+      },
+      "usage": {
+        "input_tokens": 225,
+        "output_tokens": 0
+      }
+    }
+  },
+  {
+    "name": "typed_boxes",
+    "request": {
+      "state": null,
+      "questions": {
+        "cats": {
+          "type": "number",
+          "instructions": "How many cats are there?",
+          "range": [
+            0,
+            10
+          ],
+          "step": 1
+        },
+        "remote": {
+          "type": "box",
+          "instructions": "Where is the remote control on the left?"
+        },
+        "every_cat": {
+          "type": "boxes",
+          "instructions": "Every cat.",
+          "max": 4
+        },
+        "missing": {
+          "type": "box",
+          "instructions": "Where is the elephant?"
+        },
+        "empty": {
+          "type": "boxes",
+          "instructions": "Every elephant.",
+          "max": 2
+        },
+        "default_max": {
+          "type": "boxes",
+          "instructions": "Every cat."
+        }
+      }
+    },
+    "expected": {
+      "answers": {
+        "cats": {
+          "type": "number",
+          "number": 2.0,
+          "interval": [
+            2.0,
+            2.0
+          ],
+          "unit": null
+        },
+        "remote": {
+          "type": "box",
+          "box": {
+            "top": 0.155,
+            "bottom": 0.243,
+            "left": 0.063,
+            "right": 0.276
+          },
+          "found": 1.0,
+          "confidence": 0.9828743269226758
+        },
+        "every_cat": {
+          "type": "boxes",
+          "boxes": [
+            {
+              "box": {
+                "top": 0.114,
+                "bottom": 0.987,
+                "left": 0.02,
+                "right": 0.497
+              },
+              "found": 1.0,
+              "confidence": 0.9977011494252873
+            },
+            {
+              "box": {
+                "top": 0.053,
+                "bottom": 0.777,
+                "left": 0.539,
+                "right": 0.999
+              },
+              "found": 0.9937010366857972,
+              "confidence": 0.9977011494252873
+            }
+          ],
+          "count": 2,
+          "at_least": false,
+          "presence": [
+            1.0,
+            0.9937010366857972,
+            0.0,
+            0.0
+          ]
+        },
+        "missing": {
+          "type": "box",
+          "box": null,
+          "found": 0.0027472527472527475,
+          "confidence": 0.0
+        },
+        "empty": {
+          "type": "boxes",
+          "boxes": [],
+          "count": 0,
+          "at_least": false,
+          "presence": [
+            0.0,
+            0.0
+          ]
+        },
+        "default_max": {
+          "type": "boxes",
+          "boxes": [
+            {
+              "box": {
+                "top": 0.114,
+                "bottom": 0.987,
+                "left": 0.02,
+                "right": 0.497
+              },
+              "found": 1.0,
+              "confidence": 0.9977011494252873
+            },
+            {
+              "box": {
+                "top": 0.054,
+                "bottom": 0.777,
+                "left": 0.539,
+                "right": 0.999
+              },
+              "found": 0.9953536617020025,
+              "confidence": 0.9977011494252873
+            }
+          ],
+          "count": 2,
+          "at_least": false,
+          "presence": [
+            1.0,
+            0.9953536617020025,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "usage": {
+        "input_tokens": 1243,
+        "output_tokens": 0
+      }
+    }
+  }
+]
