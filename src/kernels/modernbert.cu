@@ -1,5 +1,42 @@
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
+#include <math.h>
+
+
+
+
+
+extern "C" __global__ void modernbert_projection_f16(
+    const __half* input, const __half* weight, __half* output, int inner, int columns) {
+    const int row = blockIdx.x;
+    const int lane = threadIdx.x & 31;
+    const int column = blockIdx.y * 8 + (threadIdx.x >> 5);
+    if (column >= columns) return;
+    float running = 0.f, correction = 0.f;
+    bool exceptional = false;
+    for (int k = lane; k < inner; k += 32) {
+        const float product = __fmul_rn(float(input[row * inner + k]), float(weight[column * inner + k]));
+        exceptional |= !isfinite(product);
+        const float updated = __fadd_rn(running, product);
+        const float virtual_product = __fsub_rn(updated, running);
+        const float error = __fadd_rn(__fsub_rn(running, __fsub_rn(updated, virtual_product)), __fsub_rn(product, virtual_product));
+        correction = __fadd_rn(correction, error);
+        running = updated;
+    }
+    double sum = __dadd_rn(double(running), double(correction));
+    if (__any_sync(0xffffffff, exceptional)) {
+
+
+        sum = 0.;
+        for (int k = lane; k < inner; k += 32) {
+            sum = __fma_rn(double(float(input[row * inner + k])), double(float(weight[column * inner + k])), sum);
+        }
+    }
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        sum = __dadd_rn(sum, __shfl_down_sync(0xffffffff, sum, offset));
+    }
+    if (lane == 0) output[row * columns + column] = __float2half_rn(__double2float_rn(sum));
+}
 
 template <typename T>
 __device__ void geglu(const T* input, T* output, long long count, int inner) {
